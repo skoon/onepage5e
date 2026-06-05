@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Character, Ability, Archetype, Weapon } from '../types';
 import { ABILITIES, ABILITY_NAMES, ARCHETYPE_INFO, WEAPONS, ARMOR, WIZARD_SPELLS, getModifier, INITIAL_CHARACTER } from '../constants';
-import { generateCharacterPortrait } from '../services/geminiService';
+import { getProvider } from '../services/provider';
 
 interface CharacterCreatorProps {
   onComplete: (char: Character) => void;
@@ -117,7 +117,8 @@ const CharacterCreator: React.FC<CharacterCreatorProps> = ({ onComplete, onCance
     const archInfo = ARCHETYPE_INFO[character.archetype];
     const prompt = `A high quality fantasy portrait of a ${archInfo.label} named ${character.name || 'Hero'}. ${archInfo.description} ${character.gender ? character.gender : ''} ${character.age ? character.age + ' years old' : ''}. Digital art style, character concept art, close up, detailed face, rpg character sheet portrait.`;
     
-    const imageUrl = await generateCharacterPortrait(prompt);
+    const provider = getProvider();
+    const imageUrl = await provider.generateCharacterPortrait(prompt);
     if (imageUrl) {
         setCharacter(prev => ({ ...prev, portraitUrl: imageUrl }));
     }

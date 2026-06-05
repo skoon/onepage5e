@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Character, ChatMessage } from '../types';
-import { initGame, sendMessage } from '../services/geminiService';
+import { getProvider } from '../services/provider';
 import { EXAMPLE_MONSTERS, RANDOM_EVENTS } from '../constants';
 import CharacterSheet from './CharacterSheet';
 import DiceRoller from './DiceRoller';
@@ -33,7 +33,8 @@ const AdventureView: React.FC<AdventureViewProps> = ({ character, onExit, onChar
 
   const handleStart = async () => {
     setIsLoading(true);
-    const introText = await initGame(character, setting, goal, scenarioPrompt);
+    const provider = getProvider();
+    const introText = await provider.initGame(character, setting, goal, scenarioPrompt);
     setMessages([{ role: 'model', content: introText, timestamp: Date.now() }]);
     setGameStarted(true);
     setIsLoading(false);
@@ -47,7 +48,8 @@ const AdventureView: React.FC<AdventureViewProps> = ({ character, onExit, onChar
     setInput('');
     setIsLoading(true);
 
-    const response = await sendMessage(input);
+    const provider = getProvider();
+    const response = await provider.sendMessage(input);
     const aiMsg: ChatMessage = { role: 'model', content: response, timestamp: Date.now() };
     setMessages(prev => [...prev, aiMsg]);
     setIsLoading(false);
@@ -101,7 +103,8 @@ const AdventureView: React.FC<AdventureViewProps> = ({ character, onExit, onChar
     setMessages(prev => [...prev, userMsg]);
     setIsLoading(true);
 
-    const response = await sendMessage(actionDescription);
+    const provider = getProvider();
+    const response = await provider.sendMessage(actionDescription);
     const aiMsg: ChatMessage = { role: 'model', content: response, timestamp: Date.now() };
     setMessages(prev => [...prev, aiMsg]);
     setIsLoading(false);

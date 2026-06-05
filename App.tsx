@@ -2,10 +2,17 @@ import React, { useState } from 'react';
 import { Character, Screen } from './types';
 import CharacterCreator from './components/CharacterCreator';
 import AdventureView from './components/AdventureView';
+import { setProvider, ProviderType } from './services/provider';
 
 const App = () => {
   const [screen, setScreen] = useState<Screen>('HOME');
   const [character, setCharacter] = useState<Character | null>(null);
+  const [providerType, setProviderType] = useState<ProviderType>('gemini');
+
+  const handleProviderChange = (type: ProviderType) => {
+    setProvider(type);
+    setProviderType(type);
+  };
 
   const handleCharacterComplete = (char: Character) => {
     setCharacter(char);
@@ -32,19 +39,35 @@ const App = () => {
              </svg>
              <h1 className="text-2xl font-display font-bold tracking-wide">One Page 5e</h1>
           </div>
-          {character && (
-             <div className="flex items-center gap-4">
-               <div className="text-sm font-bold text-amber-200 hidden sm:block">
-                 {character.name}
-               </div>
-               <button 
-                 onClick={handleStartOver}
-                 className="text-xs bg-red-900 hover:bg-red-800 text-white px-3 py-1.5 rounded border border-red-700 transition-colors uppercase font-bold tracking-wider"
-               >
-                 Start Over
-               </button>
-             </div>
-          )}
+          <div className="flex items-center gap-4">
+            <div className="flex items-center gap-1 bg-amber-800/50 rounded-lg p-0.5">
+              <button
+                onClick={() => handleProviderChange('gemini')}
+                className={`text-xs px-2 py-1 rounded font-bold transition-colors ${providerType === 'gemini' ? 'bg-amber-600 text-white shadow-sm' : 'text-amber-300 hover:text-amber-100'}`}
+              >
+                Gemini
+              </button>
+              <button
+                onClick={() => handleProviderChange('ollama')}
+                className={`text-xs px-2 py-1 rounded font-bold transition-colors ${providerType === 'ollama' ? 'bg-amber-600 text-white shadow-sm' : 'text-amber-300 hover:text-amber-100'}`}
+              >
+                Ollama
+              </button>
+            </div>
+            {character && (
+              <>
+                <div className="text-sm font-bold text-amber-200 hidden sm:block">
+                  {character.name}
+                </div>
+                <button 
+                  onClick={handleStartOver}
+                  className="text-xs bg-red-900 hover:bg-red-800 text-white px-3 py-1.5 rounded border border-red-700 transition-colors uppercase font-bold tracking-wider"
+                >
+                  Start Over
+                </button>
+              </>
+            )}
+          </div>
         </div>
       </header>
 
@@ -80,7 +103,7 @@ const App = () => {
              
              <div className="text-sm text-gray-500 mt-8">
                <p>Rules based on One Page 5e by Tasha Patterson.</p>
-               <p>Powered by Google Gemini.</p>
+               <p>Powered by Gemini or local Ollama models.</p>
              </div>
           </div>
         )}
