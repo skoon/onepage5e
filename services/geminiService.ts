@@ -7,11 +7,11 @@ export class GeminiProvider implements AiProvider {
   private chatSession: Chat | null = null;
   private aiInstance: GoogleGenAI | null = null;
 
-  async initGame(character: Character, setting: string, goal: string, additionalNotes: string) {
+  async initGame(character: Character, setting: string, goal: string, additionalNotes: string): Promise<string> {
     const apiKey = process.env.API_KEY;
     if (!apiKey) {
       console.error("API Key missing");
-      return;
+      return "Gemini API key not configured. Set GEMINI_API_KEY in .env.local, or switch to Ollama. (Config Error)";
     }
 
     this.aiInstance = new GoogleGenAI({ apiKey });
@@ -50,16 +50,17 @@ export class GeminiProvider implements AiProvider {
   }
 
   async generateCharacterPortrait(prompt: string): Promise<string | null> {
-    const apiKey = process.env.API_KEY;
-    if (!apiKey) {
-      console.error("API Key missing");
-      return null;
+    if (!this.aiInstance) {
+      const apiKey = process.env.API_KEY;
+      if (!apiKey) {
+        console.error("API Key missing");
+        return null;
+      }
+      this.aiInstance = new GoogleGenAI({ apiKey });
     }
 
-    const ai = new GoogleGenAI({ apiKey });
-
     try {
-      const response = await ai.models.generateContent({
+      const response = await this.aiInstance.models.generateContent({
         model: 'gemini-2.5-flash-image',
         contents: {
           parts: [{ text: prompt }],

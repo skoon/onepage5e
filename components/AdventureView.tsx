@@ -35,7 +35,7 @@ const AdventureView: React.FC<AdventureViewProps> = ({ character, onExit, onChar
     setIsLoading(true);
     const provider = getProvider();
     const introText = await provider.initGame(character, setting, goal, scenarioPrompt);
-    setMessages([{ role: 'model', content: introText, timestamp: Date.now() }]);
+    setMessages([{ role: 'model', content: introText ?? "Error: The adventure failed to start.", timestamp: Date.now() }]);
     setGameStarted(true);
     setIsLoading(false);
   };

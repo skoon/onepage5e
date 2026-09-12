@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { D20Icon, D6Icon, D4Icon, D8Icon, D10Icon, D12Icon } from './Icons'; // Placeholder import, implementing inline
 
 const DieIcon = ({ type, className }: { type: number, className?: string }) => {
   // Simple SVG representations for dice
