@@ -2,22 +2,23 @@ import { GoogleGenAI, Chat } from "@google/genai";
 import { Character } from "../types";
 import { getSystemPrompt } from "./prompts";
 import { AiProvider } from "./types";
+import { getSettings } from "./settings";
 
 export class GeminiProvider implements AiProvider {
   private chatSession: Chat | null = null;
   private aiInstance: GoogleGenAI | null = null;
 
   async initGame(character: Character, setting: string, goal: string, additionalNotes: string): Promise<string> {
-    const apiKey = process.env.API_KEY;
+    const { geminiApiKey: apiKey, geminiModel } = getSettings();
     if (!apiKey) {
       console.error("API Key missing");
-      return "Gemini API key not configured. Set GEMINI_API_KEY in .env.local, or switch to Ollama. (Config Error)";
+      return "Gemini API key not configured. Open Settings to add your Gemini API key, or switch to Ollama. (Config Error)";
     }
 
     this.aiInstance = new GoogleGenAI({ apiKey });
 
     this.chatSession = this.aiInstance.chats.create({
-      model: 'gemini-2.5-flash',
+      model: geminiModel || 'gemini-2.5-flash',
       config: {
         systemInstruction: getSystemPrompt(character, setting, goal, additionalNotes),
         temperature: 0.9,
@@ -51,7 +52,7 @@ export class GeminiProvider implements AiProvider {
 
   async generateCharacterPortrait(prompt: string): Promise<string | null> {
     if (!this.aiInstance) {
-      const apiKey = process.env.API_KEY;
+      const { geminiApiKey: apiKey } = getSettings();
       if (!apiKey) {
         console.error("API Key missing");
         return null;

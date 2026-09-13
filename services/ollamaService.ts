@@ -1,6 +1,7 @@
 import { Character } from "../types";
 import { getSystemPrompt } from "./prompts";
 import { AiProvider } from "./types";
+import { getSettings } from "./settings";
 
 interface OllamaMessage {
   role: string;
@@ -12,17 +13,33 @@ interface OllamaChatResponse {
   done: boolean;
 }
 
+export async function pingOllama(baseUrl: string): Promise<boolean> {
+  try {
+    const res = await fetch(`${baseUrl}/api/tags`, { signal: AbortSignal.timeout(3000) });
+    return res.ok;
+  } catch {
+    return false;
+  }
+}
+
 export class OllamaProvider implements AiProvider {
   private messages: OllamaMessage[] = [];
   private baseUrl: string;
   private model: string;
 
   constructor() {
-    this.baseUrl = process.env.OLLAMA_BASE_URL || 'http://localhost:11434';
-    this.model = process.env.OLLAMA_MODEL || 'llama3.2';
+    const settings = getSettings();
+    this.baseUrl = settings.ollamaBaseUrl;
+    this.model = settings.ollamaModel;
   }
 
-  async initGame(character: Character, setting: string, goal: string, additionalNotes: string) {
+  async initGame(character: Character, setting: string, goal: string, additionalNotes: string): Promise<string> {
+    const reachable = await pingOllama(this.baseUrl);
+    if (!reachable) {
+      console.error("Ollama unreachable at", this.baseUrl);
+      return `Can't reach Ollama at ${this.baseUrl} — is it running? (Config Error)`;
+    }
+
     const systemPrompt = getSystemPrompt(character, setting, goal, additionalNotes);
 
     this.messages = [
