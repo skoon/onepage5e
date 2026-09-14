@@ -15,7 +15,7 @@ const defaults = (): ProviderSettings => ({
   geminiApiKey: process.env.API_KEY || '',
   geminiModel: 'gemini-2.5-flash',
   ollamaBaseUrl: process.env.OLLAMA_BASE_URL || 'http://localhost:11434',
-  ollamaModel: process.env.OLLAMA_MODEL || 'llama3.2',
+  ollamaModel: process.env.OLLAMA_MODEL || 'ibm/granite4.1:3b',
 });
 
 export function getSettings(): ProviderSettings {
